@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Leak</title>
+    <link rel="stylesheet" href="./style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Memory Leak</h1>
+        <a href="./whoami.html" class="whoami-link">Whoami</a>
+    </header>
+
+    <main>
+        <section class="banner">
+            <div class="overlay"></div>
+        </section>
+
+        <section class="content">
+            <h2>Welcome to Memory Leak</h2>
+            <p>Papers, Writeups and Research related to malware and offensive security.</p>
+        </section>
+    </main>
+
+    <section class="articles">
+        <h2>Latest Papers</h2>
+        
+        <div class="filter-tabs">
+            <button class="tab-btn active" onclick="switchTab('recent')">Recent</button>
+            <button class="tab-btn" onclick="switchTab('recommended')">Recommended</button>
+        </div>
+
+        <div class="articles-container">
+            <div class="articles-grid" id="articlesGrid"></div>
+        </div>
+        
+        <div class="pagination">
+            <button class="page-btn" id="prevBtn" onclick="changePage(-1)">
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">2</span></span>
+            <button class="page-btn" id="nextBtn" onclick="changePage(1)">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/lsbxa" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/marcelo-lisboa7/" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p>&copy; 2025 Memory Leak</p>
+    </footer>
+
+    <script>
+        // Article database with dates
+        const allArticles = [
+            {
+                link: './articles/writeups/voleur-htb.html',
+                img: 'imgs/voleur-htb.png',
+                title: 'Voleur - HTB Writeup',
+                description: 'Machine where we exploited a Domain Controller inside an Active Directory network, abusing weak credentials, misconfigurations, and DPAPIs.',
+                date: '2025-10-31',
+                recommended: true
+            },
+            {
+                link: './articles/writeups/fluffy-htb.html',
+                img: 'imgs/fluffy-htb.png',
+                title: 'Fluffy - HTB Writeup',
+                description: 'Machine where we exploited a Domain Controller inside an Active Directory network, abusing relay attacks, misconfigurations, and ADCS vulnerabilities.',
+                date: '2025-10-29',
+                recommended: true
+            },
+            {
+                link: './articles/writeups/retired-htb.html',
+                img: 'imgs/retired-htb.png',
+                title: 'Retired - HTB Writeup',
+                description: 'Machine focused on web application exploitation, binary exploitation, and Linux privilege escalation.',
+                date: '2025-10-28',
+                recommended: true
+            },
+            {
+                link: './articles/writeups/blog-thm.html',
+                img: 'imgs/blog-thm.png',
+                title: 'Blog - THM Writeup',
+                description: 'Machine exploring basic web exploitation concepts in CMS platforms and privilege escalation on Linux systems.',
+                date: '2025-10-27',
+                recommended: false
+            }
+        ];
+
+        const articlesPerPage = 3;
+        let currentPage = 1;
+        let currentFilter = 'recent';
+        let currentArticles = [];
+
+        function getFilteredArticles() {
+            if (currentFilter === 'recommended') {
+                return allArticles.filter(article => article.recommended);
+            }
+
+            return [...allArticles].sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        function switchTab(filter) {
+            if (currentFilter === filter) return;
+
+            currentFilter = filter;
+            currentPage = 1;
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const grid = document.getElementById('articlesGrid');
+            
+            grid.classList.add('sliding-out');
+            
+            setTimeout(() => {
+                currentArticles = getFilteredArticles();
+                renderArticles();
+                
+                grid.classList.remove('sliding-out');
+                grid.classList.add('sliding-in');
+                
+                setTimeout(() => {
+                    grid.classList.remove('sliding-in');
+                }, 50);
+            }, 300);
+        }
+
+        function renderArticles() {
+            currentArticles = getFilteredArticles();
+            const totalPages = Math.ceil(currentArticles.length / articlesPerPage);
+            
+            const grid = document.getElementById('articlesGrid');
+            const startIdx = (currentPage - 1) * articlesPerPage;
+            const endIdx = startIdx + articlesPerPage;
+            const pageArticles = currentArticles.slice(startIdx, endIdx);
+
+            grid.innerHTML = pageArticles.map(article => `
+                <a href="${article.link}" class="article-card">
+                    <img src="${article.img}" alt="${article.title}">
+                    <h3>${article.title}</h3>
+                    <p>${article.description}</p>
+                </a>
+            `).join('');
+
+            updatePaginationUI(totalPages);
+        }
+
+        function updatePaginationUI(totalPages) {
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        function changePage(direction) {
+            currentArticles = getFilteredArticles();
+            const totalPages = Math.ceil(currentArticles.length / articlesPerPage);
+            const newPage = currentPage + direction;
+            
+            if (newPage < 1 || newPage > totalPages) return;
+
+            const grid = document.getElementById('articlesGrid');
+            
+            grid.classList.add('sliding-out');
+            
+            setTimeout(() => {
+                currentPage = newPage;
+                renderArticles();
+                
+                grid.classList.remove('sliding-out');
+                grid.classList.add('sliding-in');
+                
+                setTimeout(() => {
+                    grid.classList.remove('sliding-in');
+                }, 50);
+            }, 300);
+        }
+
+        renderArticles();
+    </script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+.article-container {
+    max-width: 900px;
+    margin: 0rem auto;
+    padding: 0 1rem;
+    position: relative;
+}
+
+.article-container::before,
+.article-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--border-color);
+}
+
+.article-container::before {
+    left: 0;
+}
+
+.article-container::after {
+    right: 0;
+}
+
+.article-header {
+    text-align: center;
+    margin-bottom: 0rem;
+    padding: 2rem 0;
+}
+
+.profile-photo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid var(--border-color);
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+}
+
+.article-title {
+    font-family: 'VT323', monospace;
+    font-size: 2.5rem;
+    color: var(--heading-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.role {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.article-content {
+    padding: 0rem 2rem;
+    line-height: 1.8;
+}
+
+.article-content h2 {
+    font-family: 'VT323', monospace;
+    font-size: 1.8rem;
+    color: var(--heading-color);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.article-content p {
+    margin-bottom: 1.2rem;
+    color: var(--text-color);
+    text-align: justify;
+    font-size: 1.1rem;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.skill-tag {
+    background-color: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.skill-tag:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+
+.cert-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.cert-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text-color);
+}
+
+.cert-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.ctf-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.ctf-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.2s;
+    background-color: var(--card-bg);
+}
+
+.ctf-link:hover {
+    border-color: var(--accent-color);
+    transform: translateX(5px);
+}
+
+.ctf-link i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.article-footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.8rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.back-link:hover {
+    border-color: var(--accent-color);
+    transform: translateX(-5px);
+}
+
+@media (max-width: 768px) {
+    .article-container {
+        padding: 0 1.5rem;
+    }
+
+    .article-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .article-title {
+        font-size: 2rem;
+    }
+
+    .article-content h2 {
+        font-size: 1.5rem;
+    }
+
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .ctf-links {
+        gap: 0.8rem;
+    }
+
+    .ctf-link {
+        padding: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .article-container::before,
+    .article-container::after {
+        display: none;
+    }
+
+    .article-title {
+        font-size: 1.7rem;
+    }
+
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+    }
+}

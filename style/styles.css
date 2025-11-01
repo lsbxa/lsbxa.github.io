@@ -1,0 +1,273 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+:root {
+    --bg-color: #000000;
+    --text-color: #eee;
+    --heading-color: #ffffff;
+    --border-color: #474747a4;
+    --accent-color: #c22439;
+    --card-bg: #0a0a0a;
+    --text-secondary: #ccc;
+}
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    background-color: #000000;
+    color: #eee;
+    line-height: 1.5;
+}
+
+header {
+    padding: 1rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #474747a4;
+}
+
+header h1 {
+    font-family: 'VT323', monospace;
+    color: #ffffff;
+    font-size: 2rem;
+}
+
+.whoami-link {
+    color: #eee;
+    text-decoration: none;
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #474747a4;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.whoami-link:hover {
+    color: #c22439;
+    border-color: #c22439;
+}
+
+main {
+    flex: 1;
+}
+
+.banner {
+    position: relative;
+    text-align: center;
+    margin: -0.5rem 0;
+}
+
+.content {
+    text-align: center;
+    padding: 2rem 1rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    border: 1px solid #474747a4;
+    border-radius: 6px;
+}
+
+.content h2 {
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.articles {
+    padding: 0rem 3rem;
+    margin: 0 auto;
+    max-width: 1400px;
+    margin-top: -1rem;
+}
+
+.articles h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    font-size: 1.8rem;
+}
+
+.filter-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.7rem 1.5rem;
+    background-color: transparent;
+    color: #eee;
+    border: 1px solid #474747a4;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+}
+
+.tab-btn:hover {
+    border-color: #c22439;
+    color: #c22439;
+}
+
+.tab-btn.active {
+    background-color: #c22439;
+    border-color: #c22439;
+    color: #fff;
+}
+
+.articles-container {
+    position: relative;
+    overflow: hidden;
+    height: 500px;
+    padding-top: 1rem;
+    margin-top: -1.5rem;
+    margin-bottom: -3rem;
+}
+
+.articles-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0 1rem;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.articles-grid.sliding-out {
+    transform: translateX(-100px);
+    opacity: 0;
+}
+
+.articles-grid.sliding-in {
+    transform: translateX(100px);
+    opacity: 0;
+}
+
+.article-card {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 380px;
+    max-width: 380px;
+    padding: 1.5rem;
+    border: 1px solid #474747a4;
+    border-radius: 6px;
+    transition: transform 0.2s, border-color 0.2s;
+    background-color: #0a0a0a;
+    text-decoration: none;
+    color: inherit;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    border-color: #c22439;
+}
+
+.article-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.article-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    color: #ffffff;
+}
+
+.article-card p {
+    font-size: 0.95rem;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    padding-bottom: 3rem;
+}
+
+.page-btn {
+    padding: 0.6rem 1.2rem;
+    background-color: transparent;
+    color: #eee;
+    border: 1px solid #474747a4;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.95rem;
+}
+
+.page-btn:hover:not(:disabled) {
+    border-color: #c22439;
+    color: #c22439;
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.page-btn.active {
+    background-color: #c22439;
+    border-color: #c22439;
+    color: #fff;
+}
+
+.page-info {
+    color: #ccc;
+    font-size: 0.95rem;
+}
+
+footer {
+    padding: 1rem 3rem;
+    text-align: center;
+    border-top: 1px solid #474747a4;
+    margin-top: 0rem;
+}
+
+footer .social-links {
+    margin-bottom: 0.3rem;
+}
+
+footer .social-links a {
+    color: #eee;
+    margin: 0 0.2rem;
+    font-size: 1.5rem;
+    transition: color 0.2s;
+}
+
+footer .social-links a:hover {
+    color: #c22439;
+}
+
+@media (max-width: 768px) {
+    header {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .articles {
+        padding: 1rem 1.5rem;
+    }
+
+    .articles-grid {
+        grid-template-columns: 1fr;
+        padding: 0;
+    }
+}

