@@ -160,7 +160,7 @@ main {
     border: 1px solid #474747a4;
     border-radius: 6px;
     transition: transform 0.2s, border-color 0.2s;
-    background-color: #0a0a0a;
+    background-color: #000000;
     text-decoration: none;
     color: inherit;
 }
@@ -272,4 +272,5 @@ footer .social-links a:hover {
     }
 
 }
+
 
