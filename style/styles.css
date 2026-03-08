@@ -9,9 +9,9 @@
     --bg-color: #000000;
     --text-color: #eee;
     --heading-color: #ffffff;
-    --border-color: #474747a4;
+    --border-color: #000000;
     --accent-color: #c22439;
-    --card-bg: #0a0a0a;
+    --card-bg: #000000;
     --text-secondary: #ccc;
 }
 
@@ -32,7 +32,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #474747a4;
+    border-bottom: 1px solid #000000;
 }
 
 header h1 {
@@ -46,7 +46,7 @@ header h1 {
     text-decoration: none;
     font-size: 1.1rem;
     padding: 0.5rem 1rem;
-    border: 1px solid #474747a4;
+    border: 1px solid #000000;
     border-radius: 4px;
     transition: all 0.3s;
 }
@@ -71,7 +71,7 @@ main {
     padding: 2rem 1rem;
     margin: 2rem auto;
     max-width: 800px;
-    border: 1px solid #474747a4;
+    border: 1px solid #000000;
     border-radius: 6px;
 }
 
@@ -105,7 +105,7 @@ main {
     padding: 0.7rem 1.5rem;
     background-color: transparent;
     color: #eee;
-    border: 1px solid #474747a4;
+    border: 1px solid #000000;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s;
@@ -157,7 +157,7 @@ main {
     flex: 0 0 380px;
     max-width: 380px;
     padding: 1.5rem;
-    border: 1px solid #474747a4;
+    border: 1px solid #000000;
     border-radius: 6px;
     transition: transform 0.2s, border-color 0.2s;
     background-color: #0a0a0a;
@@ -204,7 +204,7 @@ main {
     padding: 0.6rem 1.2rem;
     background-color: transparent;
     color: #eee;
-    border: 1px solid #474747a4;
+    border: 1px solid #000000;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s;
@@ -236,7 +236,7 @@ main {
 footer {
     padding: 1rem 3rem;
     text-align: center;
-    border-top: 1px solid #474747a4;
+    border-top: 1px solid #000000;
     margin-top: 0rem;
 }
 
@@ -270,4 +270,5 @@ footer .social-links a:hover {
         grid-template-columns: 1fr;
         padding: 0;
     }
+
 }
